@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: testfleet
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: "./Backend JAVA"
+    ports:
+      - "9001:9001"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/testfleet
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: "./React_Frontend"
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
